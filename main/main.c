@@ -26,18 +26,27 @@
  * handlers for the web server.
  */
 
-static const char *TAG = "example";
-static bool LED1status = false;
-static bool LED2status = false;
+static const char *TAG = "garden";
+static bool SOL1status = false;
+static bool SOL2status = false;
+static bool SOL3status = false;
+static bool SOL4status = false;
 
-#define LED1 GPIO_NUM_18
-#define LED2 GPIO_NUM_0
+#define SOL1 GPIO_NUM_14
+#define SOL2 GPIO_NUM_27
+#define SOL3 GPIO_NUM_16
+#define SOL4 GPIO_NUM_17
 
-void SendHTML(char *ptr, uint8_t led1stat, uint8_t led2stat)
+void SendHTML(char *ptr)
 {
+    uint8_t sol1Stat = SOL1status;
+    uint8_t sol2Stat = SOL2status;
+    uint8_t sol3Stat = SOL3status;
+    uint8_t sol4Stat = SOL4status;
+
     strcat(ptr, "<!DOCTYPE html> <html>\n");
     strcat(ptr, "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n");
-    strcat(ptr, "<title>LED Control</title>\n");
+    strcat(ptr, "<title>SOL Control</title>\n");
     strcat(ptr, "<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n");
     strcat(ptr, "body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 50px;}\n");
     strcat(ptr, ".button {display: block;width: 80px;background-color: #3498db;border: none;color: white;padding: 13px 30px;text-decoration: none;font-size: 25px;margin: 0px auto 35px;cursor: pointer;border-radius: 4px;}\n");
@@ -49,25 +58,46 @@ void SendHTML(char *ptr, uint8_t led1stat, uint8_t led2stat)
     strcat(ptr, "</style>\n");
     strcat(ptr, "</head>\n");
     strcat(ptr, "<body>\n");
-    strcat(ptr, "<h1>ESP32 Web Server</h1>\n");
+    strcat(ptr, "<h1>Fern Garden Controller</h1>\n");
 
-    if (led1stat)
+    strcat(ptr, "<h2>Drippers</h2>\n");
+    if (sol1Stat)
     {
-        strcat(ptr, "<p>LED1 Status: ON</p><a class=\"button button-off\" href=\"/led1off\">OFF</a>\n");
+        strcat(ptr, "<p>Tap 1 Status: ON</p><a class=\"button button-off\" href=\"/sol1off\">OFF</a>\n");
     }
     else
     {
-        strcat(ptr, "<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/led1on\">ON</a>\n");
+        strcat(ptr, "<p>Tap 1 Status: OFF</p><a class=\"button button-on\" href=\"/sol1on\">ON</a>\n");
     }
 
-    if (led2stat)
+    if (sol2Stat)
     {
-        strcat(ptr, "<p>LED2 Status: ON</p><a class=\"button button-off\" href=\"/led2off\">OFF</a>\n");
+        strcat(ptr, "<p>Tap 2 Status: ON</p><a class=\"button button-off\" href=\"/sol2off\">OFF</a>\n");
     }
     else
     {
-        strcat(ptr, "<p>LED2 Status: OFF</p><a class=\"button button-on\" href=\"/led2on\">ON</a>\n");
+        strcat(ptr, "<p>Tap 2 Status: OFF</p><a class=\"button button-on\" href=\"/sol2on\">ON</a>\n");
     }
+
+    if (sol3Stat)
+    {
+        strcat(ptr, "<p>Tap 3 Status: ON</p><a class=\"button button-off\" href=\"/sol3off\">OFF</a>\n");
+    }
+    else
+    {
+        strcat(ptr, "<p>Tap 3 Status: OFF</p><a class=\"button button-on\" href=\"/sol3on\">ON</a>\n");
+    }
+
+    strcat(ptr, "<h2>Misters</h2>\n");
+    if (sol4Stat)
+    {
+        strcat(ptr, "<p>Tap 4 Status: ON</p><a class=\"button button-off\" href=\"/sol4off\">OFF</a>\n");
+    }
+    else
+    {
+        strcat(ptr, "<p>Tap 4 Status: OFF</p><a class=\"button button-on\" href=\"/sol4on\">ON</a>\n");
+    }
+
 
     strcat(ptr, "</body>\n");
     strcat(ptr, "</html>\n");
@@ -75,14 +105,14 @@ void SendHTML(char *ptr, uint8_t led1stat, uint8_t led2stat)
 
 static esp_err_t home_get_handler(httpd_req_t *req)
 {
-    LED1status = false;
-    LED2status = false;
+    SOL1status = false;
+    SOL2status = false;
 
     char *resp_str;
     resp_str = malloc(2048);
     memset(resp_str, 0, 2048);
 
-    SendHTML(resp_str, LED1status, LED2status);
+    SendHTML(resp_str);
 
     httpd_resp_send(req, resp_str, strlen(resp_str));
 
@@ -91,97 +121,190 @@ static esp_err_t home_get_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-static esp_err_t led1on_Handler(httpd_req_t *req)
+static esp_err_t sol1on_Handler(httpd_req_t *req)
 {
-    LED1status = true;
+    SOL1status = true;
     char *resp_str;
     resp_str = malloc(2048);
     memset(resp_str, 0, 2048);
 
-    SendHTML(resp_str, true, LED2status);
+    SendHTML(resp_str);
 
     httpd_resp_send(req, resp_str, strlen(resp_str));
 
     free(resp_str);
 
-    gpio_set_level(LED1, LED1status);
+    gpio_set_level(SOL1, SOL1status);
 
     return ESP_OK;
 }
 
-static esp_err_t led1off_Handler(httpd_req_t *req)
+static esp_err_t sol1off_Handler(httpd_req_t *req)
 {
-    LED1status = false;
+    SOL1status = false;
     char *resp_str;
     resp_str = malloc(2048);
     memset(resp_str, 0, 2048);
 
-    SendHTML(resp_str, false, LED2status);
+    SendHTML(resp_str);
 
     httpd_resp_send(req, resp_str, strlen(resp_str));
 
     free(resp_str);
 
-    gpio_set_level(LED1, LED1status);
+    gpio_set_level(SOL1, SOL1status);
 
     return ESP_OK;
 }
 
-static esp_err_t led2on_Handler(httpd_req_t *req)
+static esp_err_t sol2on_Handler(httpd_req_t *req)
 {
-    LED2status = true;
+    SOL2status = true;
     char *resp_str;
     resp_str = malloc(2048);
     memset(resp_str, 0, 2048);
 
-    SendHTML(resp_str, LED1status, true);
+    SendHTML(resp_str);
 
     httpd_resp_send(req, resp_str, strlen(resp_str));
 
     free(resp_str);
 
-    gpio_set_level(LED2, LED2status);
+    gpio_set_level(SOL2, SOL2status);
 
     return ESP_OK;
 }
 
-static esp_err_t led2off_Handler(httpd_req_t *req)
+static esp_err_t sol2off_Handler(httpd_req_t *req)
 {
-    LED2status = false;
+    SOL2status = false;
     char *resp_str;
     resp_str = malloc(2048);
     memset(resp_str, 0, 2048);
 
-    SendHTML(resp_str, LED1status, false);
+    SendHTML(resp_str);
 
     httpd_resp_send(req, resp_str, strlen(resp_str));
 
     free(resp_str);
 
-    gpio_set_level(LED2, LED2status);
+    gpio_set_level(SOL2, SOL2status);
 
     return ESP_OK;
 }
 
-static const httpd_uri_t led1on = {
-    .uri = "/led1on",
-    .method = HTTP_GET,
-    .handler = led1on_Handler};
+static esp_err_t sol3on_Handler(httpd_req_t *req)
+{
+    SOL3status = true;
+    char *resp_str;
+    resp_str = malloc(2048);
+    memset(resp_str, 0, 2048);
 
-static const httpd_uri_t led1off = {
-    .uri = "/led1off",
-    .method = HTTP_GET,
-    .handler = led1off_Handler};
+    SendHTML(resp_str);
 
-static const httpd_uri_t led2on = {
-    .uri = "/led2on",
-    .method = HTTP_GET,
-    .handler = led2on_Handler};
+    httpd_resp_send(req, resp_str, strlen(resp_str));
 
-static const httpd_uri_t led2off = {
-    .uri = "/led2off",
+    free(resp_str);
+
+    gpio_set_level(SOL1, SOL1status);
+
+    return ESP_OK;
+}
+
+static esp_err_t sol3off_Handler(httpd_req_t *req)
+{
+    SOL3status = false;
+    char *resp_str;
+    resp_str = malloc(2048);
+    memset(resp_str, 0, 2048);
+
+    SendHTML(resp_str);
+
+    httpd_resp_send(req, resp_str, strlen(resp_str));
+
+    free(resp_str);
+
+    gpio_set_level(SOL1, SOL1status);
+
+    return ESP_OK;
+}
+
+static esp_err_t sol4on_Handler(httpd_req_t *req)
+{
+    SOL4status = true;
+    char *resp_str;
+    resp_str = malloc(2048);
+    memset(resp_str, 0, 2048);
+
+    SendHTML(resp_str);
+
+    httpd_resp_send(req, resp_str, strlen(resp_str));
+
+    free(resp_str);
+
+    gpio_set_level(SOL2, SOL2status);
+
+    return ESP_OK;
+}
+
+static esp_err_t sol4off_Handler(httpd_req_t *req)
+{
+    SOL4status = false;
+    char *resp_str;
+    resp_str = malloc(2048);
+    memset(resp_str, 0, 2048);
+
+    SendHTML(resp_str);
+
+    httpd_resp_send(req, resp_str, strlen(resp_str));
+
+    free(resp_str);
+
+    gpio_set_level(SOL2, SOL2status);
+
+    return ESP_OK;
+}
+
+
+static const httpd_uri_t sol1on = {
+    .uri = "/sol1on",
     .method = HTTP_GET,
-    .handler = led2off_Handler};
+    .handler = sol1on_Handler};
+
+static const httpd_uri_t sol1off = {
+    .uri = "/sol1off",
+    .method = HTTP_GET,
+    .handler = sol1off_Handler};
+
+static const httpd_uri_t sol2on = {
+    .uri = "/sol2on",
+    .method = HTTP_GET,
+    .handler = sol2on_Handler};
+
+static const httpd_uri_t sol2off = {
+    .uri = "/sol2off",
+    .method = HTTP_GET,
+    .handler = sol2off_Handler};
+
+static const httpd_uri_t sol3on = {
+    .uri = "/sol3on",
+    .method = HTTP_GET,
+    .handler = sol3on_Handler};
+
+static const httpd_uri_t sol3off = {
+    .uri = "/sol3off",
+    .method = HTTP_GET,
+    .handler = sol3off_Handler};
+
+static const httpd_uri_t sol4on = {
+    .uri = "/sol4on",
+    .method = HTTP_GET,
+    .handler = sol4on_Handler};
+
+static const httpd_uri_t sol4off = {
+    .uri = "/sol4off",
+    .method = HTTP_GET,
+    .handler = sol4off_Handler};
 
 static const httpd_uri_t home = {
     .uri = "/",
@@ -200,6 +323,7 @@ static httpd_handle_t start_webserver(void)
 {
     httpd_handle_t server = NULL;
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.max_uri_handlers = 10;
 
     // Start the httpd server
     ESP_LOGI(TAG, "Starting server on port: '%d'", config.server_port);
@@ -208,10 +332,14 @@ static httpd_handle_t start_webserver(void)
         // Set URI handlers
         ESP_LOGI(TAG, "Registering URI handlers");
         httpd_register_uri_handler(server, &home);
-        httpd_register_uri_handler(server, &led1on);
-        httpd_register_uri_handler(server, &led1off);
-        httpd_register_uri_handler(server, &led2on);
-        httpd_register_uri_handler(server, &led2off);
+        httpd_register_uri_handler(server, &sol1on);
+        httpd_register_uri_handler(server, &sol1off);
+        httpd_register_uri_handler(server, &sol2on);
+        httpd_register_uri_handler(server, &sol2off);
+        httpd_register_uri_handler(server, &sol3on);
+        httpd_register_uri_handler(server, &sol3off);
+        httpd_register_uri_handler(server, &sol4on);
+        httpd_register_uri_handler(server, &sol4off);
         return server;
     }
 
@@ -248,18 +376,24 @@ static void connect_handler(void *arg, esp_event_base_t event_base,
     }
 }
 
+void init_gpio(void)
+{
+    gpio_pad_select_gpio(SOL1);
+    gpio_set_direction(SOL1, GPIO_MODE_OUTPUT);
+
+    gpio_pad_select_gpio(SOL2);
+    gpio_set_direction(SOL2, GPIO_MODE_OUTPUT);
+
+    gpio_pad_select_gpio(SOL3);
+    gpio_set_direction(SOL3, GPIO_MODE_OUTPUT);
+
+    gpio_pad_select_gpio(SOL4);
+    gpio_set_direction(SOL4, GPIO_MODE_OUTPUT);
+}
+
 void app_main(void)
 {
-    gpio_pad_select_gpio(LED1);
-    gpio_set_direction(LED1, GPIO_MODE_OUTPUT);
-
-    gpio_pad_select_gpio(LED2);
-    gpio_set_direction(LED2, GPIO_MODE_OUTPUT);
-
-    gpio_set_level(LED1, false);
-    gpio_set_level(LED2, false);
-
-
+    init_gpio();
 
     static httpd_handle_t server = NULL;
 
