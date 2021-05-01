@@ -206,7 +206,7 @@ static esp_err_t sol3on_Handler(httpd_req_t *req)
 
     free(resp_str);
 
-    gpio_set_level(SOL1, SOL1status);
+    gpio_set_level(SOL3, SOL3status);
 
     return ESP_OK;
 }
@@ -224,7 +224,7 @@ static esp_err_t sol3off_Handler(httpd_req_t *req)
 
     free(resp_str);
 
-    gpio_set_level(SOL1, SOL1status);
+    gpio_set_level(SOL3, SOL3status);
 
     return ESP_OK;
 }
@@ -242,7 +242,7 @@ static esp_err_t sol4on_Handler(httpd_req_t *req)
 
     free(resp_str);
 
-    gpio_set_level(SOL2, SOL2status);
+    gpio_set_level(SOL4, SOL4status);
 
     return ESP_OK;
 }
@@ -260,7 +260,7 @@ static esp_err_t sol4off_Handler(httpd_req_t *req)
 
     free(resp_str);
 
-    gpio_set_level(SOL2, SOL2status);
+    gpio_set_level(SOL4, SOL4status);
 
     return ESP_OK;
 }
